@@ -11,11 +11,9 @@ export const handlePaystackEvent = (
   signature: string
 ): boolean => {
   const computedSignature = crypto
-    .createHmac("sha256", PAYSTACK_SECRET_KEY)
+    .createHmac("sha512", PAYSTACK_SECRET_KEY)
     .update(JSON.stringify(payload))
     .digest("hex");
-
-  console.log("Expected signature:", computedSignature);
 
   return signature === computedSignature;
 };
