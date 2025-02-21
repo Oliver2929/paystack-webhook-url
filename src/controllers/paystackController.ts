@@ -1,8 +1,5 @@
 import { Request, Response } from "express";
-import {
-  handlePaystackEvent,
-  updateRevenue,
-} from "../services/paystackService";
+import { updateRevenue } from "../services/paystackService";
 import { PaystackEvent } from "../types/paystack";
 
 let totalRevenue = 0;
@@ -11,13 +8,6 @@ let chargebacks = 0;
 
 export const paystackWebhook = (req: Request, res: Response): void => {
   const payload = req.body;
-  const signature = req.headers["x-paystack-signature"] as string;
-
-  if (!handlePaystackEvent(payload, signature)) {
-    console.error("Signature mismatch. Expected:", signature);
-    res.status(400).send("Invalid signature");
-    return;
-  }
 
   try {
     console.log("Received Paystack Webhook:", JSON.stringify(payload, null, 2));
@@ -62,7 +52,7 @@ export const paystackWebhook = (req: Request, res: Response): void => {
       console.error("An unknown error occurred");
     }
     if (!res.headersSent) {
-      res.status(400).send("Invalid signature or unknown error");
+      res.status(400).send("Error processing request");
     }
   }
 };
