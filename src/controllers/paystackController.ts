@@ -14,17 +14,21 @@ export const paystackWebhook = (req: Request, res: Response): void => {
   const signature = req.headers["x-paystack-signature"] as string;
 
   if (!handlePaystackEvent(payload, signature)) {
+    console.error("Signature mismatch. Expected:", signature);
     res.status(400).send("Invalid signature");
     return;
   }
 
   try {
+    console.log("Received Paystack Webhook:", JSON.stringify(payload, null, 2));
+
     const event = payload;
-    console.log("Received event:", event);
 
     switch (event.event) {
       case "charge.success":
         console.log("Payment successful for ₦", event.data.amount / 100);
+        console.log("Transaction Reference:", event.data.reference);
+        console.log("Customer Email:", event.data.email);
         break;
 
       case "charge.failed":
@@ -57,7 +61,9 @@ export const paystackWebhook = (req: Request, res: Response): void => {
     } else {
       console.error("An unknown error occurred");
     }
-    res.status(400).send("Invalid signature or unknown error");
+    if (!res.headersSent) {
+      res.status(400).send("Invalid signature or unknown error");
+    }
   }
 };
 
