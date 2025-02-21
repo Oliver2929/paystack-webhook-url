@@ -13,12 +13,13 @@ export const paystackWebhook = (req: Request, res: Response): void => {
   const payload = req.body;
   const signature = req.headers["x-paystack-signature"] as string;
 
-  res.status(200).send("OK");
+  console.log("Received payload:", payload);
 
   try {
     handlePaystackEvent(payload, signature);
 
     const event: PaystackEvent = req.body;
+    console.log("Received event:", event);
 
     switch (event.event) {
       case "charge.success":
@@ -48,9 +49,7 @@ export const paystackWebhook = (req: Request, res: Response): void => {
     failedPayments = updatedData.failedPayments;
     chargebacks = updatedData.chargebacks;
 
-    console.log("Updated Revenue:", totalRevenue);
-    console.log("Failed Payments:", failedPayments);
-    console.log("Chargebacks:", chargebacks);
+    res.status(200).send("OK");
   } catch (error: unknown) {
     if (error instanceof Error) {
       console.error("Error processing the event:", error.message);
