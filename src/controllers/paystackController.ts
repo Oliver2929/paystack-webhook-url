@@ -13,12 +13,13 @@ export const paystackWebhook = (req: Request, res: Response): void => {
   const payload = req.body;
   const signature = req.headers["x-paystack-signature"] as string;
 
-  console.log("Received payload:", payload);
+  if (!handlePaystackEvent(payload, signature)) {
+    res.status(400).send("Invalid signature");
+    return;
+  }
 
   try {
-    handlePaystackEvent(payload, signature);
-
-    const event: PaystackEvent = req.body;
+    const event = payload;
     console.log("Received event:", event);
 
     switch (event.event) {

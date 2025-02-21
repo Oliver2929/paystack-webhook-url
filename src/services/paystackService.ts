@@ -7,20 +7,17 @@ dotenv.config();
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY as string;
 
 export const handlePaystackEvent = (
-  payload: Buffer,
+  payload: any,
   signature: string
-): string => {
-  const expectedSignature = crypto
+): boolean => {
+  const computedSignature = crypto
     .createHmac("sha512", PAYSTACK_SECRET_KEY)
-    .update(payload)
+    .update(JSON.stringify(payload))
     .digest("hex");
 
-  console.log("Expected signature:", expectedSignature);
+  console.log("Expected signature:", computedSignature);
 
-  if (signature !== expectedSignature) {
-    throw new Error("Invalid signature");
-  }
-  return "Signature is valid";
+  return signature === computedSignature;
 };
 
 export const updateRevenue = (
