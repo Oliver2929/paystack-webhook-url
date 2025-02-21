@@ -18,6 +18,23 @@ export const paystackWebhook = (req: Request, res: Response): void => {
 
     const event: PaystackEvent = req.body;
 
+    switch (event.event) {
+      case "charge.success":
+        console.log("Payment successful for ₦", event.data.amount / 100);
+        break;
+
+      case "charge.failed":
+        console.log("Payment failed for ₦", event.data.amount / 100);
+        break;
+
+      case "chargeback.created":
+        console.log("Chargeback created for ₦", event.data.amount / 100);
+        break;
+
+      default:
+        console.log("Unknown event received:", event.event);
+    }
+
     const updatedData = updateRevenue(
       event,
       totalRevenue,
